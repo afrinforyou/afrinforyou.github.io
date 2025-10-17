@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Afrin — তোমার জন্য (v2)</title>
+<link rel="manifest" href="#manifest" id="manifest-link">
+<style>
+  :root{
+    --bg:#0a0710; --card:#0f0b14; --accent:#ff7a9a; --accent2:#ffd1c1; --muted:#b7c0d6; --glass: rgba(255,255,255,0.03);
+    --romantic1: #ffb3c6; --romantic2: #8b5cf6; --romantic3: #ff8aa8;
+    font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; min-height:100vh; background:linear-gradient(180deg,#05030a 0%, #0a0710 60%);
+    color:#f6eef6; -webkit-font-smoothing:antialiased; display:flex; align-items:center; justify-content:center; padding:18px;
+  }
+  .app{
+    width:100%; max-width:1100px; background:linear-gradient(180deg,var(--card), #05040a); border-radius:16px; padding:16px; box-shadow: 0 12px 40px rgba(2,6,15,0.7);
+    display:grid; grid-template-columns: 300px 1fr; gap:18px; overflow:hidden;
+  }
+  /* sidebar */
+  .sidebar{padding:14px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:12px}
+  .ava{width:72px;height:72px;border-radius:14px;background:linear-gradient(135deg,var(--romantic1),var(--romantic3));display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:#3b0a14;box-shadow:0 10px 30px rgba(255,122,154,0.12)}
+  h1{font-size:20px;margin:0}
+  .small{color:var(--muted);font-size:13px;margin-top:4px}
+  nav{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+  .nav-btn{background:transparent;border:0;text-align:left;padding:10px;border-radius:10px;color:#f0e9f2;display:flex;align-items:center;gap:10px;cursor:pointer;font-size:15px}
+  .nav-btn.active,.nav-btn:hover{background:linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));box-shadow:inset 0 0 0 1px rgba(255,255,255,0.02)}
+  .muted{color:var(--muted)}
+
+  /* header */
+  .main{padding:14px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));min-height:500px;display:flex;flex-direction:column}
+  .topbar{display:flex;justify-content:space-between;align-items:center}
+  .title{font-size:18px}
+
+  /* login overlay */
+  .overlay{position:fixed;inset:0;background:linear-gradient(180deg, rgba(3,2,6,0.7), rgba(3,2,6,0.85));display:flex;align-items:center;justify-content:center;padding:20px;z-index:99}
+  .login-card{width:100%;max-width:420px;background:linear-gradient(180deg,#13081a,#0b0610);border-radius:12px;padding:18px;box-shadow:0 10px 40px rgba(2,6,15,0.8)}
+  .field{margin-top:10px}
+  input[type="password"], input[type="text"], input[type="file"], textarea{width:100%;padding:10px;border-radius:10px;border:0;background:rgba(255,255,255,0.02);color:inherit}
+  .btn{background:linear-gradient(90deg,var(--accent), #ff9fb0);border:0;padding:10px 12px;border-radius:10px;color:#fff;cursor:pointer}
+  .link-btn{background:transparent;border:0;color:var(--muted);cursor:pointer}
+
+  /* chat */
+  .chat-wrap{display:flex;flex-direction:column;gap:12px;height:100%}
+  .messages{flex:1;overflow:auto;padding:8px;display:flex;flex-direction:column;gap:10px}
+  .bubble{max-width:72%;padding:10px 12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:0 6px 18px rgba(2,6,15,0.35)}
+  .me{align-self:flex-end;background:linear-gradient(135deg,var(--romantic3),var(--romantic1));color:#3b0a14;border-bottom-right-radius:4px}
+  .her{align-self:flex-start;border-bottom-left-radius:4px}
+  .chat-input{display:flex;gap:8px;padding:8px}
+
+  /* countdown */
+  .countdown{display:flex;gap:8px;margin-top:12px}
+  .count-item{flex:1;padding:8px;background:var(--glass);border-radius:10px;text-align:center}
+
+  /* gallery */
+  .gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .photo{height:110px;border-radius:10px;overflow:hidden;position:relative}
+  .photo img{width:100%;height:100%;object-fit:cover}
+  .photo .del{position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.4);color:white;border-radius:6px;padding:4px;border:0}
+
+  /* theme toggle */
+  .theme-toggle{display:flex;align-items:center;gap:8px}
+
+  /* small helpers */
+  footer{margin-top:12px;color:var(--muted);font-size:13px}
+
+  /* romantic sparkle */
+  .sparkles{position:absolute;left:0;right:0;top:-40px;height:120px;pointer-events:none;background-image:radial-gradient(circle at 20% 30%, rgba(255,182,193,0.06) 0, transparent 20%), radial-gradient(circle at 80% 60%, rgba(139,92,246,0.05) 0, transparent 18%)}
+
+  @media (max-width:880px){.app{grid-template-columns:1fr}.sidebar{order:2}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="sidebar">
+    <div style="display:flex;gap:12px;align-items:center">
+      <div class="ava" id="ava">Af</div>
+      <div>
+        <h1>Afrin</h1>
+        <div class="small">তোমার জন্য—সাদা ফুলের মতো কোমল</div>
+      </div>
+    </div>
+
+    <nav>
+      <button class="nav-btn active" data-target="home">🏠 হোম</button>
+      <button class="nav-btn" data-target="chat">💬 চ্যাট</button>
+      <button class="nav-btn" data-target="countdown">⏳ কাউন্টডাউন</button>
+      <button class="nav-btn" data-target="gallery">📷 গ্যালারি</button>
+      <button class="nav-btn" data-target="notes">📝 নোট</button>
+      <button class="nav-btn" data-target="settings">⚙️ সেটিংস</button>
+    </nav>
+
+    <div style="margin-top:12px" class="muted">অবস্থা: <strong id="status">অফলাইন</strong></div>
+    <footer>
+      Made with ❤️ — তোমার স্বামী • <span id="version">v2</span>
+    </footer>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="title">Afrin — তোমার জন্য</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="theme-toggle"><label class="muted">থিম</label><button id="themeBtn" class="link-btn">Toggle</button></div>
+        <button id="musicBtn" class="link-btn">বাজাও ♫</button>
+        <button id="logout" class="link-btn">লগআউট</button>
+      </div>
+    </div>
+
+    <!-- HOME -->
+    <div id="home" class="panel">
+      <div style="position:relative">
+        <div class="sparkles"></div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+          <div>
+            <h2>সুপ্রভাত, Afrin 🌸</h2>
+            <div class="muted">আমি তোমাকে খুব মিস করি — একটু এখানে দেখে নাও।</div>
+
+            <div class="countdown" style="margin-top:12px">
+              <div class="count-item"><div class="muted">দিন</div><strong id="cd-days">0</strong></div>
+              <div class="count-item"><div class="muted">ঘন্টা</div><strong id="cd-hours">00</strong></div>
+              <div class="count-item"><div class="muted">মিনিট</div><strong id="cd-mins">00</strong></div>
+              <div class="count-item"><div class="muted">সেকেন্ড</div><strong id="cd-secs">00</strong></div>
+            </div>
+
+            <div style="margin-top:12px" class="muted">আমি সাধারণত সোমবার থেকে শুক্রবার অফিসে থাকি — শুক্রবার সন্ধ্যায় বাসায় ফেরি।</div>
+          </div>
+
+          <div style="width:320px">
+            <div style="background:var(--glass);padding:12px;border-radius:10px">
+              <div class="muted">আজকের নোট</div>
+              <div id="today-note" style="font-weight:700;font-size:16px;margin-top:6px">তুমি একেবারে সুন্দর লাগছো।</div>
+              <div style="margin-top:8px;display:flex;gap:8px">
+                <input id="quickMsg" placeholder="তুমি কেমন আছো?"/>
+                <button class="btn" onclick="sendQuick()">পাঠাও</button>
+              </div>
+            </div>
+            <div style="margin-top:12px;display:flex;gap:8px">
+              <button class="btn" onclick="showSurprise()">সারপ্রাইজ দেখাও</button>
+              <button class="link-btn" onclick="downloadBackup()">Export</button>
+              <input id="importFile" type="file" style="display:none" accept="application/json" onchange="importBackup(event)"/>
+              <button class="link-btn" onclick="document.getElementById('importFile').click()">Import</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHAT -->
+    <div id="chat" class="panel" style="display:none">
+      <div class="chat-wrap">
+        <div class="messages" id="chatMessages"></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input id="chatInput" placeholder="মেসেজ লিখো..." onkeydown="if(event.key==='Enter'){sendChat();}">
+          <button class="btn" onclick="sendChat()">পাঠাও</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- COUNTDOWN panel -->
+    <div id="countdown" class="panel" style="display:none">
+      <h3>ফিরে আসার ক্যালকুলেটর</h3>
+      <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+        <label class="muted">টার্গেট</label>
+        <input type="date" id="manualDate"/>
+        <input type="time" id="manualTime" value="18:00"/>
+        <button class="btn" onclick="setManual()">সেভ</button>
+        <button class="link-btn" onclick="clearManual()">রিসেট</button>
+      </div>
+      <div id="targetInfo" class="muted" style="margin-top:10px"></div>
+    </div>
+
+    <!-- GALLERY -->
+    <div id="gallery" class="panel" style="display:none">
+      <h3>ফটো গ্যালারি</h3>
+      <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+        <input type="file" id="photoInput" accept="image/*"/>
+        <button class="btn" onclick="addPhoto()">অ্যাড</button>
+        <button class="link-btn" onclick="clearPhotos()">সব মুছো</button>
+      </div>
+      <div class="gallery-grid" id="galleryGrid" style="margin-top:12px"></div>
+    </div>
+
+    <!-- NOTES -->
+    <div id="notes" class="panel" style="display:none">
+      <h3>ভালোদের নোট</h3>
+      <div id="notesList" style="margin-top:8px"></div>
+      <div style="margin-top:8px;display:flex;gap:8px">
+        <input id="noteText" placeholder="একটি মধুর কথা লিখুন..."/>
+        <button class="btn" onclick="addNote()">নোট যোগ করো</button>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="settings" class="panel" style="display:none">
+      <h3>সেটিংস</h3>
+      <div style="margin-top:8px">
+        <label class="muted">Background music</label>
+        <div style="display:flex;gap:8px;margin-top:6px">
+          <button class="btn" onclick="toggleMusic()">Play/Pause</button>
+          <button class="link-btn" onclick="toggleSound()">Notification sound: <span id="soundState">On</span></button>
+        </div>
+      </div>
+      <div style="margin-top:12px">
+        <label class="muted">Theme</label>
+        <div style="margin-top:6px;display:flex;gap:8px">
+          <button class="btn" onclick="setTheme('romantic')">Romantic</button>
+          <button class="btn" onclick="setTheme('soft')">Soft</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Login overlay -->
+<div id="overlay" class="overlay" style="display:none">
+  <div class="login-card">
+    <h3>লগইন</h3>
+    <div class="field"><input id="username" placeholder="তোমার নাম (উদাহরণ: Afrin)"/></div>
+    <div class="field"><input id="pin" placeholder="4 অঙ্কের পিন"/></div>
+    <div style="display:flex;gap:8px;margin-top:10px"><button class="btn" onclick="doLogin()">লগইন</button><button class="link-btn" onclick="skipLogin()">পরে করব</button></div>
+    <div style="margin-top:8px" class="muted">পাসওয়ার্ড লোকালি সংরক্ষিত — ইনটারনেটে কোথাও পাঠানো হয় না।</div>
+  </div>
+</div>
+
+<script>
+/* ------------------ App State & Keys ------------------ */
+const KEYS = { user: 'afrin_user_v2', chat: 'afrin_chat_v2', photos: 'afrin_photos_v2', notes: 'afrin_notes_v2', manual: 'afrin_manual_v2', today: 'afrin_today_note_v2', settings: 'afrin_settings_v2' };
+let currentUser = null;
+let settings = JSON.parse(localStorage.getItem(KEYS.settings) || '{}');
+
+/* ------------------ Navigation ------------------ */
+const navButtons = document.querySelectorAll('.nav-btn');
+const panels = document.querySelectorAll('.panel');
+navButtons.forEach(b=>b.addEventListener('click', ()=>{
+  navButtons.forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  const t = b.getAttribute('data-target');
+  panels.forEach(p=>p.style.display = (p.id===t)?'block':'none');
+}));
+
+/* ------------------ Login ------------------ */
+const overlay = document.getElementById('overlay');
+function showLogin(){ overlay.style.display='flex'; }
+function hideLogin(){ overlay.style.display='none'; }
+function doLogin(){
+  const name = document.getElementById('username').value.trim() || 'Afrin';
+  const pin = document.getElementById('pin').value.trim();
+  if(pin && pin.length<4){alert('৪ অঙ্কের পিন দিন');return}
+  currentUser = {name, pin: pin||null};
+  localStorage.setItem(KEYS.user, JSON.stringify(currentUser));
+  init(); hideLogin();
+}
+function skipLogin(){ hideLogin(); init(); }
+function logout(){ localStorage.removeItem(KEYS.user); location.reload(); }
+document.getElementById('logout').addEventListener('click', logout);
+
+/* ------------------ Countdown logic ------------------ */
+function nextFridayAt(hour=18, minute=0){
+  const now = new Date(); const d = now.getDay(); let daysUntil = (5 - d + 7) % 7;
+  if(daysUntil===0){ const maybe = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute); if(now>=maybe) daysUntil=7 }
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysUntil, hour, minute);
+}
+function getTarget(){ const manual = JSON.parse(localStorage.getItem(KEYS.manual) || 'null'); return manual ? new Date(manual) : nextFridayAt(18,0); }
+function updateTargetInfo(){ const t = getTarget(); document.getElementById('targetInfo').textContent = 'লক্ষ্য: ' + t.toLocaleString(); }
+function updateCountdowns(){ const now = new Date(); const t = getTarget(); let diff = Math.max(0, t.getTime()-now.getTime()); const days = Math.floor(diff/(24*3600*1000)); diff -= days*24*3600*1000; const hours = Math.floor(diff/(3600*1000)); diff -= hours*3600*1000; const mins = Math.floor(diff/(60*1000)); diff -= mins*60*1000; const secs = Math.floor(diff/1000);
+  document.getElementById('cd-days').textContent = days; document.getElementById('cd-hours').textContent = String(hours).padStart(2,'0'); document.getElementById('cd-mins').textContent = String(mins).padStart(2,'0'); document.getElementById('cd-secs').textContent = String(secs%60).padStart(2,'0');
+  const status = document.getElementById('status'); const nowDay = now.getDay(); const isHome = (nowDay===5 && now.getHours()>=18); status.textContent = (days===0&&hours===0&&mins===0&&secs===0)?'তুমি বাসায় ফিরে এসেছো! 🎉':(isHome?'বসায় আছো (শুভ আগমন)':'অফলাইন');
+}
+setInterval(updateCountdowns,1000);
+
+/* manual set */
+function setManual(){ const d=document.getElementById('manualDate').value; const t=document.getElementById('manualTime').value; if(!d||!t) return alert('তারিখ/সময় নির্বাচন করুন'); const dt = new Date(d+'T'+t); if(isNaN(dt)) return alert('ভুল ইনপুট'); localStorage.setItem(KEYS.manual, JSON.stringify(dt.toISOString())); updateTargetInfo(); }
+function clearManual(){ localStorage.removeItem(KEYS.manual); updateTargetInfo(); }
+
+/* ------------------ Messages/Chat ------------------ */
+function loadChats(){ return JSON.parse(localStorage.getItem(KEYS.chat) || '[]'); }
+function saveChats(a){ localStorage.setItem(KEYS.chat, JSON.stringify(a)); }
+function renderChat(){ const wrap=document.getElementById('chatMessages'); wrap.innerHTML=''; const arr=loadChats(); arr.forEach(m=>{ const b = document.createElement('div'); b.className='bubble '+(m.from==='me'?'me':'her'); b.innerHTML = `<div style="font-size:12px;color:var(--muted)">${m.time}</div><div style="margin-top:6px">${escapeHtml(m.text)}</div>`; wrap.appendChild(b); }); wrap.scrollTop = wrap.scrollHeight; }
+function sendChat(){ const inp=document.getElementById('chatInput'); const t=inp.value.trim(); if(!t) return; const arr=loadChats(); arr.push({from:'me',text:t,time:new Date().toLocaleString()}); saveChats(arr); inp.value=''; renderChat(); playNotif(); // simulate reply
+  showTyping(); setTimeout(()=>{ const arr2 = loadChats(); arr2.push({from:'her',text:generateReply(t),time:new Date().toLocaleString()}); saveChats(arr2); renderChat(); hideTyping(); }, 1200 + Math.random()*1600);
+}
+function generateReply(userText){ const replies = [ 'আমি তোমাকে খুব মিস করছি ❤️', 'তোমার কণ্ঠ কেমন ছিলো আজ?', 'আজ কি ভালো লাগলো?', 'তুমি আমার স্বপ্নে এসেছিলে...']; return replies[Math.floor(Math.random()*replies.length)]; }
+function showTyping(){ const wrap=document.getElementById('chatMessages'); const el = document.createElement('div'); el.id='typing'; el.className='bubble her'; el.innerHTML='<div style="font-size:12px;color:var(--muted)">Afrin টাইপ করছে...</div><div style="margin-top:6px">•••</div>'; wrap.appendChild(el); wrap.scrollTop = wrap.scrollHeight; }
+function hideTyping(){ const t=document.getElementById('typing'); if(t) t.remove(); }
+
+/* quick */
+function sendQuick(){ const q=document.getElementById('quickMsg'); const text=q.value.trim(); if(!text) return; const arr=loadChats(); arr.push({from:'me',text,time:new Date().toLocaleString()}); saveChats(arr); q.value=''; renderChat(); }
+
+/* ------------------ Gallery ------------------ */
+function loadPhotos(){ return JSON.parse(localStorage.getItem(KEYS.photos) || '[]'); }
+function savePhotos(a){ localStorage.setItem(KEYS.photos, JSON.stringify(a)); }
+function addPhoto(){ const inp=document.getElementById('photoInput'); if(!inp.files||!inp.files[0]) return alert('একটি ছবি বেছে নিন'); const f = inp.files[0]; const r=new FileReader(); r.onload=function(e){ const arr=loadPhotos(); arr.push({data:e.target.result,name:f.name,time:new Date().toLocaleString()}); savePhotos(arr); renderGallery(); inp.value=''; }; r.readAsDataURL(f); }
+function renderGallery(){ const g=document.getElementById('galleryGrid'); g.innerHTML=''; const arr=loadPhotos(); if(arr.length===0){ for(let i=0;i<6;i++){ const ph=document.createElement('div'); ph.className='photo'; ph.style.display='flex'; ph.style.alignItems='center'; ph.style.justifyContent='center'; ph.style.background='linear-gradient(135deg,var(--romantic1),var(--romantic2))'; ph.textContent=['🌸','🌅','💕','🌙','🌻','✨'][i%6]; g.appendChild(ph);} return;} arr.slice().reverse().forEach((p,idx)=>{ const el=document.createElement('div'); el.className='photo'; const img=document.createElement('img'); img.src=p.data; el.appendChild(img); const del=document.createElement('button'); del.className='del'; del.textContent='✕'; del.onclick=()=>{ if(!confirm('মুছে ফেলতে চান?')) return; const all=loadPhotos(); all.splice(all.length-1-idx,1); savePhotos(all); renderGallery(); }; el.appendChild(del); g.appendChild(el); }); }
+function clearPhotos(){ if(!confirm('সব ছবি মুছে ফেলবেন?')) return; savePhotos([]); renderGallery(); }
+
+/* ------------------ Notes ------------------ */
+function loadNotes(){ return JSON.parse(localStorage.getItem(KEYS.notes) || '[]'); }
+function saveNotes(a){ localStorage.setItem(KEYS.notes, JSON.stringify(a)); }
+function renderNotes(){ const box=document.getElementById('notesList'); box.innerHTML=''; const arr=loadNotes(); if(arr.length===0){ box.innerHTML='<div class="muted">কোনো নোট নেই — একটি যোগ করুন ❤️</div>'; return;} arr.slice().reverse().forEach((n,idx)=>{ const d=document.createElement('div'); d.style.background='var(--glass)'; d.style.padding='8px'; d.style.borderRadius='8px'; d.style.marginBottom='8px'; d.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:700">${escapeHtml(n.text)}</div><div style="font-size:12px;color:var(--muted)">${n.time}</div></div><div><button class="link-btn" onclick="deleteNote(${idx})">মুছো</button></div></div>`; box.appendChild(d); }); }
+function addNote(){ const t=document.getElementById('noteText'); const text=t.value.trim(); if(!text) return; const arr=loadNotes(); arr.push({text,time:new Date().toLocaleString()}); saveNotes(arr); t.value=''; renderNotes(); }
+function deleteNote(i){ if(!confirm('মুছে ফেলবেন?')) return; const a=loadNotes(); a.splice(a.length-1-i,1); saveNotes(a); renderNotes(); }
+
+/* ------------------ backup export/import ------------------ */
+function downloadBackup(){ const payload = { user: JSON.parse(localStorage.getItem(KEYS.user)||'null'), chat: loadChats(), photos: loadPhotos(), notes: loadNotes(), manual: JSON.parse(localStorage.getItem(KEYS.manual)||'null') };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='afrin_backup_'+(new Date()).toISOString().slice(0,19).replace(/:/g,'-')+'.json'; a.click(); URL.revokeObjectURL(url);
+}
+function importBackup(e){ const f = e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=function(ev){ try{ const obj=JSON.parse(ev.target.result); if(obj.chat) localStorage.setItem(KEYS.chat, JSON.stringify(obj.chat)); if(obj.photos) localStorage.setItem(KEYS.photos, JSON.stringify(obj.photos)); if(obj.notes) localStorage.setItem(KEYS.notes, JSON.stringify(obj.notes)); if(obj.manual) localStorage.setItem(KEYS.manual, JSON.stringify(obj.manual)); alert('Backup restored'); init(); }catch(err){ alert('Invalid file'); } }; r.readAsText(f); }
+
+/* ------------------ small utils ------------------ */
+function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>\"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'})[m]); }
+
+/* ------------------ Today note rotation ------------------ */
+const QUOTES = [ 'তুমি আমার পৃথিবীর নরম আলো ☀️', 'তোমার হাসি ভোরের চা-এর মতো স্বচ্ছ', 'আজকের নোট: তোমার হাতটা ধরতে চাই', 'তুমি আমার প্রিয় গান', 'হিন্দু রেখেছে তোমার জন্য ফুল', 'আজ তোমার কপালে একটু চুমু 😘' ];
+function rotateNote(){ const idx = Math.floor(Math.random()*QUOTES.length); const note = localStorage.getItem(KEYS.today) || QUOTES[idx]; document.getElementById('today-note').textContent = note; }
+
+/* ------------------ Background music & sound ------------------ */
+let audio = new Audio(); audio.loop = true; audio.src = ''; // set on demand
+let notifOn = true;
+function toggleMusic(){ if(!audio.src){ // embed a tiny base64 audio (short loop) or use silent default
+  // For demo, we will not set remote audio. Leave to user to upload via settings in future.
+  alert('এই ডেমোতে কোনো মিউজিক অন্তর্ভুক্ত নেই — নির্মাতাকে একটি ফাইল আপলোড করতে বলো বা কোডে URL বসাও।'); return; }
+  if(audio.paused) audio.play(); else audio.pause(); }
+function toggleSound(){ notifOn = !notifOn; document.getElementById('soundState').textContent = notifOn ? 'On' : 'Off'; }
+function playNotif(){ if(!notifOn) return; const t = new Audio(); t.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA='; t.play().catch(()=>{}); }
+
+/* ------------------ Notifications & typing demo ------------------ */
+function showSurprise(){ alert('Afrin, তুমি আমার পৃথিবী ☀️ — ভার্চুয়াল আলিঙ্গন! 🤗'); }
+
+/* ------------------ PWA: manifest & service worker dynamic generation ------------------ */
+function registerPWA(){
+  // create simple manifest blob
+  const manifest = { name: 'Afrin — তোমার জন্য', short_name: 'Afrin', start_url: '.', display: 'standalone', background_color: '#0a0710', theme_color: '#ff7a9a', icons: [] };
+  const mBlob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+  const mURL = URL.createObjectURL(mBlob);
+  document.getElementById('manifest-link').setAttribute('href', mURL);
+
+  // register a minimal service worker via blob
+  if('serviceWorker' in navigator){
+    const swCode = `self.addEventListener('install', e=>{self.skipWaiting();});self.addEventListener('activate', e=>{self.clients.claim();});self.addEventListener('fetch', e=>{});`;
+    const swBlob = new Blob([swCode], {type:'application/javascript'});
+    const swURL = URL.createObjectURL(swBlob);
+    navigator.serviceWorker.register(swURL).then(()=>console.log('sw registered')).catch(()=>{});
+  }
+}
+registerPWA();
+
+/* ------------------ Init / render ------------------ */
+function init(){
+  const u = JSON.parse(localStorage.getItem(KEYS.user) || 'null'); if(!u){ showLogin(); } else { currentUser = u; hideLogin(); }
+  document.getElementById('ava').textContent = (currentUser&&currentUser.name)?(currentUser.name.split(' ')[0].slice(0,2)):'Af';
+  renderChat(); renderGallery(); renderNotes(); updateTargetInfo(); rotateNote(); updateCountdowns(); document.getElementById('version').textContent = 'v2';
+}
+
+/* If first time, seed a sample chat for warmth */
+if(!localStorage.getItem(KEYS.chat)){ const s=[{from:'her',text:'আমি তোমাকে ভালোবাসি 💖',time:new Date().toLocaleString()}]; localStorage.setItem(KEYS.chat, JSON.stringify(s)); }
+
+/* helpers */
+function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>\"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'})[m]); }
+
+/* small event hookups */
+window.sendChat = sendChat; window.sendQuick = sendQuick; window.addPhoto = addPhoto; window.clearPhotos = clearPhotos; window.addNote = addNote; window.downloadBackup = downloadBackup; window.importBackup = importBackup; window.setManual = setManual; window.clearManual = clearManual; window.showSurprise = showSurprise; window.toggleMusic = toggleMusic; window.toggleSound = toggleSound; window.setTheme = setTheme;
+
+/* theme */
+function setTheme(t){ if(t==='romantic'){ document.documentElement.style.setProperty('--romantic1','#ffd1dc'); document.documentElement.style.setProperty('--romantic2','#8b5cf6'); document.documentElement.style.setProperty('--romantic3','#ff7a9a'); } else { document.documentElement.style.setProperty('--romantic1','#cde7ff'); document.documentElement.style.setProperty('--romantic2','#a8ffef'); document.documentElement.style.setProperty('--romantic3','#ffd1a8'); } }
+
+/* auto init */
+init();
+
+/* On first load, prompt login if not present */
+if(!localStorage.getItem(KEYS.user)){ showLogin(); }
+
+</script>
+</body>
+</html>
